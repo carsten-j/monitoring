@@ -1,0 +1,1 @@
+docker network create --driver bridge monitoring_network
