@@ -7,9 +7,20 @@ networks:
 
 services:
 
+  aspnetcoreapp:
+    image: aspnetcoreapp
+    build:
+      context: ./aspnetcoreapp
+    ports:
+      - "5000:5000"
+    depends_on:
+      - 'influxdb'
+
   influxdb:
-    image: influxdb:latest
+    build: influxdb
     container_name: influxdb
+    env_file:
+      - influxdb.env
     ports:
       - "8086:8086"
     volumes:
@@ -24,6 +35,3 @@ services:
       - influxdb
     volumes:
       - ./data/grafana_data:/var/lib/grafana
-
-
-

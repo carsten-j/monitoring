@@ -2,3 +2,7 @@ data
 influxdb
 config.env
 influxdb.conf
+aspnetcoreapp/bin
+aspnetcoreapp/obj
+aspnetcoreapp/out
+.vscode/
