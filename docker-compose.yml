@@ -18,6 +18,7 @@ services:
 
   influxdb:
     build: influxdb
+    image: myinflux
     container_name: influxdb
     env_file:
       - influxdb.env

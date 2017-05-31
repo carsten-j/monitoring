@@ -37,23 +37,23 @@ namespace aspnetcoreapp
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            // InfluxDB middleware
-            app.Use(next => async context =>
-            {
-                Metrics.Increment("Requests");
-                try
-                {
-                    using (var time = Metrics.Time("Request"))
-                    {
-                        await next(context);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Metrics.Increment("Exception", 1, new Dictionary<string, string> { { "Type", ex.GetType().Name } });
-                    throw;
-                }
-            });
+            // // InfluxDB middleware
+            // app.Use(next => async context =>
+            // {
+            //     Metrics.Increment("Requests");
+            //     try
+            //     {
+            //         using (var time = Metrics.Time("Request"))
+            //         {
+            //             await next(context);
+            //         }
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         Metrics.Increment("Exception", 1, new Dictionary<string, string> { { "Type", ex.GetType().Name } });
+            //         throw;
+            //     }
+            // });
 
             app.UseMvc();
         }
