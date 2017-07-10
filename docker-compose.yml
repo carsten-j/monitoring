@@ -21,15 +21,18 @@ services:
     image: myinflux
     container_name: influxdb
     env_file:
-      - influxdb.env
+      - configuration.env
     ports:
       - "8086:8086"
     volumes:
       - ./data/influxdb_data:/var/lib/influxdb
 
   grafana:
-    image: grafana/grafana:latest
+    build: grafana
+    image: mygrafana
     container_name: grafana
+    env_file:
+      - configuration.env
     ports:
       - "3000:3000"
     links:
