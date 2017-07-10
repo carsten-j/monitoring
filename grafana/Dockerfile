@@ -1,7 +1,6 @@
-FROM grafana/grafana:4.3.2
+FROM grafana/grafana:4.4.1
 
 WORKDIR /etc/grafana
-COPY grafana.ini ./
 ADD dashboards ./dashboards  
 
 WORKDIR /app  
