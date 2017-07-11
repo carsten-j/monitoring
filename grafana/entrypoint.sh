@@ -1,30 +1,31 @@
 #!/usr/bin/env sh
 
+transform_dashboard_json() {
+	cat $1 | jq --arg INFLUX_DATABASE "$INFLUX_DATABASE" '.rows[0].panels[0].datasource = $INFLUX_DATABASE | { dashboard:.,overwrite: true }'
+}
+
 if [ ! -f "/var/lib/grafana/.db" ]; then
 
-	grafana_url="http://admin:admin@localhost:3000/api/datasources"
-	#grafana_url_dashboards="http://$GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD@localhost:3000/api/dashboards/db"
-	grafana_url_dashboards="http://admin:admin@localhost:3000/api/dashboards/db"
+	url="http://admin:admin@localhost:3000/"
 
 	exec /run.sh $@ &
 
-	until curl -s $grafana_url 2>/dev/null; do
+	until curl -s ${url}"api/datasources" 2>/dev/null; do
 		sleep 1
 	done
 
-	#until nc localhost 3000 < /dev/null; do sleep 1; done
+	for datasource in /etc/grafana/datasources/*.json; do
+		curl "${url}api/datasources" \
+			-X POST -H 'Content-Type: application/json' \
+			-d "$(envsubst <$datasource)"
+	done
 
-	curl $grafana_url \
-		-X POST -H 'Content-Type: application/json' \
-		--data '{"name":"influx", "type":"influxdb", "url":"http://influxdb:8086", "access":"proxy", "isDefault":true, "database":"myaspnetcoreapp", "user":"foo","password":"bar"}'
-
-	db=/etc/grafana/dashboards/mgd-1499716839734.json
-	grafana_template=$(cat "$db")
-	dashboard="{\"overwrite\":true,\"dashboard\": $grafana_template }"
-
-	curl $grafana_url_dashboards \
-		-X POST -H 'Content-Type: application/json' \
-		--data "$dashboard"
+	for dashboard in /etc/grafana/dashboards/*.json; do
+		dashboard_json=$(transform_dashboard_json $dashboard)
+		curl "${url}api/dashboards/db" \
+			-X POST -H 'Content-Type: application/json' \
+			--data "$dashboard_json"
+	done
 
 	touch "/var/lib/grafana/.db"
 
